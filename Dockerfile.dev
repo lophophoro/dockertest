@@ -1,0 +1,37 @@
+#FROM alpine <- es la imagen por defecto, es una imagen minima de linux alpine, no contiene node
+#la mayoria de las librerias tienen una version alpine
+#en este caso se necesita node para poder usar npm
+FROM node:alpine
+
+#COPY <origen> <destino>
+#COPY ./ ./ <- copia el directorio actual a la raiz de la imagen, pero no es recomendable por cuanto un archivo del proyecto podria reescribir un archivo de sistema
+#una mejor opcion es primero usar workdir, especificamente creado para solventar este problema
+WORKDIR /usr/app
+
+#se copiara el archivo package al directorio /usr/app (que sera el directorio de trabajo por defecto)
+COPY ./package.json ./
+
+#al haber copiado package.json a la imagen, es posible ahora ejecutar npm install
+RUN npm install
+
+#una vez instaladas las dependencias, se copia el resto del contenido
+#asi, todas la imagenes intermedias que se creen se haran a partir de este punto,
+#a menos que se modifique el package.json, en ese caso se vuelve a "compilar" la imagen desde cero
+#se puede omitir copiar los archivos en desarrollo, pero es absolutamente necesario en produccion
+COPY ./ ./
+
+#decirle a la imagen que hacer cuando inicia como contenedor
+#este comando por defecto se puede sobreescribir al iniciar el contenedor: docker run [container_name] [new_parameter]
+CMD ["npm","start"]
+
+#pasos:
+#1 docker build -t misuperimagen .
+#2 docker run -p 8080:8080 misuperimagen  (el orden del los flags es importante)
+#3* docker run -it -p 8080:8080 misuperimagen sh <- no funciona
+#3 docker exec -it 8dd79f506289 sh <- inicia un nuevo proceso (abre otra shell)
+
+
+#**powershell**: correr contenedor con volumenes (alternativa a docker-compose)
+#docker run -it -p 3000:3000 -v /usr/app/node_modules -v ${pwd}:/usr/app -e CHOKIDAR_USEPOLLING=true johao/frontenddocker
+
+#CHOKIDAR_USEPOLLING=true para habilitar Hot Module Reload (HMR)

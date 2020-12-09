@@ -1,0 +1,17 @@
+language: generic
+
+#1 decirle a travis que se necesita docker
+sudo: required
+services:
+  - docker
+
+#2 construir la imagen usando Dockerfile.dev
+before_install:
+  - docker build -t lophophoro/dockertest -f Dockerfile.dev .
+
+#3 decirle a travis como correr la suit
+#si este paso termina con un codigo distinto de 0, travis asumira que el codigo esta roto
+script:
+  - docker run -e CI=true lophophoro/dockertest npm run test
+#-e CI=true permite finalizar los tests, de otro modo docker quedaria esperando alguna orden nueva
+#4 decirle a travis como desplegar el codigo en aws

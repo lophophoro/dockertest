@@ -1,0 +1,28 @@
+version: "3"
+services:
+  web:
+    stdin_open: true
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+    build:
+      context: .
+      dockerfile: dockerfile.dev
+    ports:
+      - "3000:3000"
+    volumes:
+      - /usr/app/node_modules
+      - .:/usr/app
+  tests:
+    build:
+      context: .
+      dockerfile: dockerfile.dev
+    volumes:
+      - /usr/app/node_modules
+      - .:/usr/app
+    command: ["npm", "run", "test"]
+#stdin_open: true es para evitar un bug al iniciar el servidor react (sale con codigo 0)
+#environment: para establecer variables de entorno
+#CHOKIDAR_USEPOLLING=true para habilitar Hot Module Reload (HMR) para que se vean reflejados los cambios en "vivo" (de otra forma habria que recontruir la imagen cada vez)
+#context: indica de qué carpeta se tomaran los archivos para hacer la imagen
+#volumes (/src/app/node_modules): se reserva como espacio de memoria "dinamico" dentro del container
+#volumes (.:/src/app): los archivos dentro de "/src/app" son un referncia a los archivos en "." (<externo>:<interno>)
