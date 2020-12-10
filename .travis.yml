@@ -29,8 +29,7 @@ deploy:
   on:
     branch: master
   access_key_id: $AWS_ACCESS_KEY
-  secret_access_key:
-    secure: "$AWS_SECRET_KEY"
+  secret_access_key: $AWS_SECRET_KEY
 #bucket_name: en el dashboard ir a "services"->"all services"-> buscar "s3" -> seleccionar de la lista
 #bucket_path: el mismo nombre que "app"
 #access_key_id: variable de entorno que se establece en travis (https://travis-ci.com/github/lophophoro/dockertest/settings)
