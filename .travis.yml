@@ -15,3 +15,25 @@ script:
   - docker run -e CI=true lophophoro/dockertest npm run test
 #-e CI=true permite finalizar los tests, de otro modo docker quedaria esperando alguna orden nueva
 #4 decirle a travis como desplegar el codigo en aws
+
+#4 deployment
+# la region se obtiene de http://dockertest-env.eba-2pk8qmji.us-east-2.elasticbeanstalk.com
+# notar donde dice "us-east-2" (esta direccion esta en el dashboard una vez el entorno docker fue creado en aws)
+deploy:
+  provider: elasticbeanstalk
+  region: "us-east-2"
+  app: "docker-test"
+  env: "DockerTest-env"
+  bucket_name: "elasticbeanstalk-us-east-2-121607027350"
+  bucket_path: "docker-test"
+  on:
+    branch: master
+  access_key_id: $AWS_ACCESS_KEY
+  secret_access_key:
+    secure: "$AWS_SECRET_KEY"
+#bucket_name: en el dashboard ir a "services"->"all services"-> buscar "s3" -> seleccionar de la lista
+#bucket_path: el mismo nombre que "app"
+#access_key_id: variable de entorno que se establece en travis (https://travis-ci.com/github/lophophoro/dockertest/settings)
+#secret_access_key: tambien se establece en travis. notar: secure: "$AWS_SECRET_KEY", usa comillas dobles
+#5 buscar servicio IAM y añadir usuario travis otorgando  "Programmatic access" y "AWS Management Console access"
+# -> Attach existing policies directly -> buscar beanstalk -> seleccionar "AWSElasticBeanstalkFullAccess" ( o por el estilo...) y "IAMUserChangePassword"
