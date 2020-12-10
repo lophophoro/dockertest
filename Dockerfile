@@ -10,7 +10,9 @@ RUN npm run build
 #--from=0 quiere decir, "desde fase 0"
 #la imagen nginx usa el comando por defecto "start nginx", por lo que no hace falta especificarlo aqui usando "RUN"
 FROM nginx
+EXPOSE 80
 COPY --from=0 /app/build /usr/share/nginx/html
 
 #nginx corre en el puerto 80
 #para ejecutar la imagen, usar: docker run -p 8080:80 <id>
+#EXPOSE 80: en produccion es necesario para que elastic beanstalk pueda acceder al contenedor. en desarrollo es totalmente ignorado
