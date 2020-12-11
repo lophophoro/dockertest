@@ -14,11 +14,13 @@ before_install:
 script:
   - docker run -e CI=true lophophoro/dockertest npm run test
 #-e CI=true permite finalizar los tests, de otro modo docker quedaria esperando alguna orden nueva
-#4 decirle a travis como desplegar el codigo en aws
 
-#4 deployment
-# la region se obtiene de http://dockertest-env.eba-2pk8qmji.us-east-2.elasticbeanstalk.com
-# notar donde dice "us-east-2" (esta direccion esta en el dashboard una vez el entorno docker fue creado en aws)
+#4 deployment: instrucciones para travis para conectar a aws
+#a) services -> Elastic Beanstalk -> crear entorno -> anotar la region ("us-east-2" en http://dockertest-env.eba-2pk8qmji.us-east-2.elasticbeanstalk.com)
+#b) services -> S3 -> seleccionar el entorno creado y copiar el nombre del bucket (elasticbeanstalk-us-east-2-121607027350). el bucket_path es el nombre de la app (app: "docker-test")
+#c) services -> IAM -> users -> add user -> "Programmatic access" y "AWS Management Console access" -> existing policies ->"AWSElasticBeanstalkFullAccess" y "IAMUserChangePassword" -> anotar api keys
+#d) https://travis-ci.com ->My Repositories->lophophoro/dockertest->More options->settings->Environment Variables-> establecer AWS_ACCESS_KEY y AWS_SECRET_KEY con los datos del paso anterior
+
 deploy:
   provider: elasticbeanstalk
   region: "us-east-2"
@@ -30,9 +32,3 @@ deploy:
     branch: master
   access_key_id: $AWS_ACCESS_KEY
   secret_access_key: $AWS_SECRET_KEY
-#bucket_name: en el dashboard ir a "services"->"all services"-> buscar "s3" -> seleccionar de la lista
-#bucket_path: el mismo nombre que "app"
-#access_key_id: variable de entorno que se establece en travis (https://travis-ci.com/github/lophophoro/dockertest/settings)
-#secret_access_key: tambien se establece en travis. notar: secure: "$AWS_SECRET_KEY", usa comillas dobles
-#5 buscar servicio IAM y añadir usuario travis otorgando  "Programmatic access" y "AWS Management Console access"
-# -> Attach existing policies directly -> buscar beanstalk -> seleccionar "AWSElasticBeanstalkFullAccess" ( o por el estilo...) y "IAMUserChangePassword"
